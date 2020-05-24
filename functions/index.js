@@ -18,7 +18,7 @@ app.post('/createScream',FBAuth,createScream);
 //users route
 app.post('/signup',signup);
 app.post('/login',login);
-app.post('/user/image',uploadImage)
+app.post('/user/image',FBAuth,uploadImage);
 
 
 

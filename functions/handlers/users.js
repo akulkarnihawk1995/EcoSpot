@@ -20,6 +20,8 @@ exports.signup = (request,response)=>{
     if(!valid){
         return response.status(400).json(errors);
     }
+    const noImgage = 'no-image.png';
+
 
     let token,userId;
     db.doc(`/users/${newUser.handle}`).get()
@@ -41,6 +43,7 @@ exports.signup = (request,response)=>{
                     handle:newUser.handle,
                     email:newUser.email,
                     createdAt:new Date().toISOString(),
+                    imageUrl:`https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImgage}?alt=media`,
                     userId
                 };
                 return db.doc(`/users/${newUser.handle}`).set(userCredentials);
@@ -84,6 +87,45 @@ exports.login = (request,response)=>{
     });
 };
 exports.uploadImage = (request,response)=>{
-    
 
+    const BusBoy = require('busboy');
+    const path = require('path');
+    const os = require('os');
+    const fs = require('fs');
+
+    const busboy = new BusBoy({headers:request.headers});
+    let imageFileName;
+    let imageToBeUploaded = {};
+    busboy.on('file',(fieldname,file,filename,encoding,mimetype)=>{
+
+        if(mimetype!=='image/jpeg' && mimetype!=='image/png'){
+            return response.status(400).json({message:'Wrong file type'});
+        }
+        const imageExtension = filename.split('.')[filename.split('.').length -1 ];
+        imageFileName = `${Math.round(Math.random()*10000000)}.${imageExtension}`;
+        const filePath = path.join(os.tmpdir(),imageFileName);
+        imageToBeUploaded = {filePath,mimetype};
+        file.pipe(fs.createWriteStream(filePath));
+        busboy.on('finish',()=>{
+            admin.storage().bucket().upload(imageToBeUploaded.filePath,{
+                resumable:false,
+                metadata:{
+                    metadata:{
+                    contentType : imageToBeUploaded.mimetype
+                }
+            }
+            })
+            .then(()=>{
+                const imageUrl  = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
+                return db.doc(`/users/${request.user.handle}`).update({imageUrl});
+            })
+            .then(()=>{ 
+                response.json({message:'Image uploaded succesfully'});
+            })
+            .catch(err=>{
+                response.status(500).json({error:err.code,});
+            })
+        });
+    })
+    busboy.end(request.rawBody);
 };
