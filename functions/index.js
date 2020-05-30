@@ -6,7 +6,7 @@ const FBAuth = require('./util/FBAuth');
 
 
 //get all screams
-const {getScreams, createScream, getScreamsbyId, commentOnScream} = require('./handlers/getScreams');
+const {getScreams, createScream, getScreamsbyId, commentOnScream,likeScream,unlikeScream} = require('./handlers/getScreams');
 const {signup, login,uploadImage, addUserDetails,getAuthenticatedUser} = require('./handlers/users');
 
 //scream routes
@@ -14,8 +14,8 @@ app.get('/getScreams',getScreams);
 app.post('/createScream',FBAuth,createScream);
 app.get('/getScreams/:screamId',getScreamsbyId);
 // TODO:deleting scream
-// TODO:like a scream
-// TODO: unliking a scream
+app.get('/getScreams/:screamId/like',FBAuth,likeScream);
+app.get('/getScreams/:screamId/unlike',FBAuth,unlikeScream);
 app.post('/getScreams/:screamId/comment',FBAuth,commentOnScream);
 
 //users route
