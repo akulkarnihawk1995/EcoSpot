@@ -37,3 +37,50 @@ exports.createScream = (request,response)=>{
         console.log(err);
     });
 };
+
+exports.getScreamsbyId = (request,response)=>{
+    let screamData = {};
+    db.doc(`/screams/${request.params.screamId}`).get()
+        .then((doc)=>{
+            if(!doc.exists){
+                return response.status(404).json({error:'Scream not found'});
+            }
+                screamData = doc.data();
+                screamData.screamId = doc.id;
+                return db.collection('comments').orderBy('createdAt','desc').where('screamId','==',request.params.screamId).get();
+        })
+                    .then(data=>{
+                        screamData.comments = [];
+                        data.forEach(doc=>{
+                            screamData.comments.push(doc.data())
+                        });
+                        return response.json(screamData);
+                    }).catch(err=>{
+                        return response.status(500).json({error:err.code});
+                    });
+    };
+
+    exports.commentOnScream = (request,response)=>{
+        if(request.body.body.trim()===''){
+            return response.status(400).json({error:'Inputy must not be empty'});
+        }
+        const newComment = {
+            body:request.body.body,
+            createdAt:new Date().toISOString(),
+            screamId:request.params.screamId,
+            userhandle:request.user.handle,
+            userImage:request.user.imageUrl
+        };
+
+        db.doc(`/screams/${request.params.screamId}`).get()
+        .then((doc)=>{
+            if(!doc.exists){
+                return response.status(404).json({error:'Scream not found'});
+            }
+            return db.collection('comments').add(newComment)
+        }).then(()=>{
+            response.json(newComment);
+        }).catch(err=>{
+            return response.status(500).json({error:'Something went wrong'});
+        });
+    };
