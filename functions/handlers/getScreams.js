@@ -183,3 +183,30 @@ exports.getScreamsbyId = (request,response)=>{
             res.status(500).json({ error: err.code });
           });
       };
+
+      //delete scream
+
+      exports.deleteScream = (req, res) => {
+        const document = db.doc(`/screams/${req.params.screamId}`);
+        document
+          .get()
+          .then((doc) => {
+            if (!doc.exists) {
+              return res.status(404).json({ error: 'Scream not found' });
+            }
+            if (doc.data().userhandle !== req.user.handle) {
+              return res.status(403).json({ error: 'Unauthorized for delete', dochandle: `hello ${doc.data().userHandle}`,reqhandle: `hello ${req.user.handle}`});
+            } else {
+              return document.delete();
+            }
+          })
+          .then(() => {
+            res.json({ message: 'Scream deleted successfully' });
+          })
+          .catch((err) => {
+            console.error(err);
+            return res.status(500).json({ error: err.code });
+          });
+      };
+      
+      
