@@ -96,7 +96,7 @@ exports.getScreamsbyId = (request,response)=>{
     exports.likeScream = (req, res) => {
         const likeDocument = db
           .collection('likes')
-          .where('userHandle', '==', req.user.handle)
+          .where('userhandle', '==', req.user.handle)
           .where('screamId', '==', req.params.screamId)
           .limit(1);
       
@@ -121,7 +121,7 @@ exports.getScreamsbyId = (request,response)=>{
                 .collection('likes')
                 .add({
                   screamId: req.params.screamId,
-                  userHandle: req.user.handle
+                  userhandle: req.user.handle
                 })
                 .then(() => {
                   screamData.likeCount++;
@@ -143,7 +143,7 @@ exports.getScreamsbyId = (request,response)=>{
     exports.unlikeScream = (req, res) => {
         const likeDocument = db
           .collection('likes')
-          .where('userHandle', '==', req.user.handle)
+          .where('userhandle', '==', req.user.handle)
           .where('screamId', '==', req.params.screamId)
           .limit(1);
       
