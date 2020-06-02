@@ -22,6 +22,8 @@ const {
   uploadImage,
   addUserDetails,
   getAuthenticatedUser,
+  getUserDetail,
+  markNotificationsRead
 } = require("./handlers/users");
 
 //scream routes
@@ -39,6 +41,8 @@ app.post("/login", login);
 app.post("/user/image", FBAuth, uploadImage);
 app.post("/user", FBAuth, addUserDetails);
 app.get("/user", FBAuth, getAuthenticatedUser);
+app.get("/user/:handle", getUserDetail);
+app.post("/notifications",FBAuth, markNotificationsRead);
 
 exports.api = functions.https.onRequest(app);
 
