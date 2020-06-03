@@ -13,7 +13,10 @@ exports.getScreams = (request,response) => {
                     screamId:doc.id,
                     body:doc.data().body,
                     userhandle:doc.data().userhandle,
-                    createdAt:doc.data().createdAt
+                    createdAt:doc.data().createdAt,
+                    commentCount:doc.data().commentCount,
+                    likeCount:doc.data().likeCount,
+                    userImage:doc.data().userImage
                 });
             });
             return response.json(screams);
@@ -67,7 +70,7 @@ exports.getScreamsbyId = (request,response)=>{
 
     exports.commentOnScream = (request,response)=>{
         if(request.body.body.trim()===''){
-            return response.status(400).json({error:'Inputy must not be empty'});
+            return response.status(400).json({comment:'Input must not be empty'});
         }
         const newComment = {
             body:request.body.body,

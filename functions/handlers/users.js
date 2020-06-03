@@ -64,7 +64,7 @@ exports.signup = (request, response) => {
         return response.status(400).json({ email: "email already in use" });
       } else {
         console.log(err);
-        return response.status(500).json({ error: err.code });
+        return response.status(500).json({ general:`something went wrong. Please try again.` });
       }
     });
 };
@@ -92,7 +92,7 @@ exports.login = (request, response) => {
       if (err.code == "auth/wrong-password") {
         return response
           .status(400)
-          .json({ message: "Please enter correct password and try again" });
+          .json({ message: "Wrong credentials. Please try again" });
       }
       return response.status(500).json({ err: err.code });
     });
